@@ -2,8 +2,8 @@ resource "aws_lb" "test" {
   name               = "${var.env}-alb"
   internal           = var.internal
   load_balancer_type = var.lb_type
-  security_groups    =
-  subnets            = [for subnet in aws_subnet.public : subnet.id]
+  security_groups    = [aws_security_group.main.id]
+  subnets            =
 
   enable_deletion_protection = true
 
@@ -17,3 +17,24 @@ resource "aws_lb" "test" {
     Environment = "production"
   }
 }
+resource "aws_security_group" "main" {
+  name        = "${var.env}-alb-sg"
+  description = "${var.env}-alb-sg"
+  vpc_id      = var.vpc_id
+  tags = merge(local.tags, {Name = "${var.env}-alb-sg"} )
+
+  ingress {
+    description = "app"
+    from_port   = var.sg_port
+    protocol    = "tcp"
+    to_port     = var.sg_port
+    cidr_blocks = var.sg_ingress_cidr
+  }
+  egress {
+    from_port   = 0
+    protocol    = "-1"
+    to_port     = 0
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
