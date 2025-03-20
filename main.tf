@@ -1,5 +1,5 @@
 resource "aws_lb" "test" {
-  name               = "${var.env}-alb"
+  name               = local.alb_name
   internal           = var.internal
   load_balancer_type = var.lb_type
   security_groups    = [aws_security_group.main.id]
